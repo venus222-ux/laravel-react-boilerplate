@@ -14,7 +14,7 @@ interface AppState {
   startTokenRefreshLoop: () => void;
 }
 
-let refreshInterval: NodeJS.Timeout | null = null;
+let refreshInterval: ReturnType<typeof setInterval> | null = null;
 
 export const useStore = create<AppState>((set, get) => ({
   isAuth: !!localStorage.getItem("token"),
