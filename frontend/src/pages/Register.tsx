@@ -3,6 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import API from "../api";
 import { toast } from "react-toastify";
 
+import styles from "./Register.module.css";
+
 interface FormData {
   name: string;
   email: string;
@@ -10,7 +12,7 @@ interface FormData {
   password_confirmation: string;
 }
 
-const Register = () => {
+export default function Register() {
   const [form, setForm] = useState<FormData>({
     name: "",
     email: "",
@@ -21,16 +23,13 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleRegister = async (e: FormEvent) => {
     e.preventDefault();
 
-    // Client-side validation
     if (form.password !== form.password_confirmation) {
       toast.error("Passwords do not match");
       return;
@@ -72,46 +71,51 @@ const Register = () => {
     }
   };
 
+  const passwordsMatch =
+    form.password === form.password_confirmation || !form.password_confirmation;
+
   return (
-    <div className="container d-flex align-items-center justify-content-center vh-100">
-      <div className="card shadow p-4" style={{ width: "100%", maxWidth: 450 }}>
-        <div className="text-center mb-4">
-          <h3 className="mb-2">
-            <i className="bi bi-person-plus me-2"></i> Create Account
-          </h3>
-          <p className="text-muted small">Join our community</p>
+    <div className={styles.wrapper}>
+      <div className={styles.card}>
+        <div className={styles.header}>
+          <h2 className={styles.title}>
+            <span>📝</span> Create Account
+          </h2>
+          <p className={styles.subtitle}>Join our community today</p>
         </div>
 
         <form onSubmit={handleRegister}>
-          <div className="mb-3">
-            <label className="form-label fw-semibold">Full Name</label>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Full Name</label>
             <input
-              className="form-control"
+              className={styles.input}
               placeholder="Enter your full name"
               name="name"
               value={form.name}
               onChange={handleChange}
               required
+              autoComplete="name"
             />
           </div>
 
-          <div className="mb-3">
-            <label className="form-label fw-semibold">Email Address</label>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Email Address</label>
             <input
-              className="form-control"
+              className={styles.input}
               type="email"
               placeholder="you@example.com"
               name="email"
               value={form.email}
               onChange={handleChange}
               required
+              autoComplete="email"
             />
           </div>
 
-          <div className="mb-3">
-            <label className="form-label fw-semibold">Password</label>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Password</label>
             <input
-              className="form-control"
+              className={styles.input}
               type="password"
               placeholder="Minimum 6 characters"
               name="password"
@@ -119,61 +123,50 @@ const Register = () => {
               onChange={handleChange}
               required
               minLength={6}
+              autoComplete="new-password"
             />
           </div>
 
-          <div className="mb-4">
-            <label className="form-label fw-semibold">Confirm Password</label>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Confirm Password</label>
             <input
-              className="form-control"
+              className={styles.input}
               type="password"
               placeholder="Re-enter your password"
               name="password_confirmation"
               value={form.password_confirmation}
               onChange={handleChange}
               required
+              autoComplete="new-password"
             />
-            {form.password !== form.password_confirmation &&
-              form.password_confirmation && (
-                <div className="text-danger small mt-1">
-                  Passwords do not match
-                </div>
-              )}
+            {!passwordsMatch && form.password_confirmation && (
+              <span className={styles.error}>Passwords do not match</span>
+            )}
           </div>
 
-          <button
-            className="btn btn-primary w-100 py-2 fw-semibold"
-            disabled={loading}
-          >
+          <button type="submit" className={styles.btn} disabled={loading}>
             {loading ? (
               <>
                 <span
-                  className="spinner-border spinner-border-sm me-2"
+                  className={`${styles.spinner} spinner-border spinner-border-sm`}
                   role="status"
                   aria-hidden="true"
-                ></span>
+                />
                 Creating Account...
               </>
             ) : (
-              <>
-                <i className="bi bi-person-plus me-2"></i>
-                Register
-              </>
+              "Register"
             )}
           </button>
         </form>
 
-        <div className="text-center mt-4">
-          <p className="text-muted small mb-1">
-            Already have an account?{" "}
-            <Link to="/login" className="text-decoration-none">
-              Sign In
-            </Link>
-          </p>
+        <div className={styles.linkContainer}>
+          Already have an account?{" "}
+          <Link to="/login" className={styles.link}>
+            Sign In
+          </Link>
         </div>
       </div>
     </div>
   );
-};
-
-export default Register;
+}

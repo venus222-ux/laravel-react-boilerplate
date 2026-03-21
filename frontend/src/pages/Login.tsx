@@ -1,17 +1,18 @@
 import { useState, FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import API from "../api";
 import { toast } from "react-toastify";
 import { useStore } from "../store/useStore";
+import API from "../api";
 
-const Login = () => {
+import styles from "./Login.module.css";
+
+export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const navigate = useNavigate();
   const setAuth = useStore((state) => state.setAuth);
 
-  // pages/Login.tsx (updated)
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -19,56 +20,68 @@ const Login = () => {
       const res = await API.post("/login", { email, password });
       const { token, role } = res.data;
 
-      // Save auth + role in Zustand + localStorage
       setAuth(token, role);
+      toast.success("Welcome back! 👋");
 
-      toast.success("Welcome back!");
-
-      // Role-based redirect
       if (role === "admin") {
-        navigate("/admin/dashboard"); // redirect admins
+        navigate("/admin/dashboard");
       } else {
-        navigate("/dashboard"); // regular users
+        navigate("/dashboard");
       }
-    } catch {
-      toast.error("Invalid credentials");
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || "Invalid credentials";
+      toast.error(msg);
     }
   };
 
   return (
-    <div className="container d-flex align-items-center justify-content-center vh-100">
-      <div className="card shadow p-4" style={{ width: "100%", maxWidth: 420 }}>
-        <h3 className="text-center mb-3">🔑 Login</h3>
+    <div className={styles.wrapper}>
+      <div className={styles.card}>
+        <h2 className={styles.title}>
+          <span>🔐</span> Sign In
+        </h2>
 
         <form onSubmit={handleLogin}>
-          <input
-            className="form-control mb-3"
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+          <div className={styles.formGroup}>
+            <input
+              className={styles.input}
+              type="email"
+              placeholder="Email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value.trim())}
+              required
+              autoFocus
+              autoComplete="email"
+            />
+          </div>
 
-          <input
-            className="form-control mb-3"
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          <div className={styles.formGroup}>
+            <input
+              className={styles.input}
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="current-password"
+            />
+          </div>
 
-          <button className="btn btn-primary w-100 mb-3">Login</button>
+          <button type="submit" className={styles.btn}>
+            Log In
+          </button>
         </form>
 
-        <div className="d-flex justify-content-between small">
-          <Link to="/register">📝 Register</Link>
-          <Link to="/forgot-password">Forgot password?</Link>
+        <div className={styles.links}>
+          <Link to="/register" className={styles.link}>
+            Create account
+          </Link>
+
+          <Link to="/forgot-password" className={styles.link}>
+            Forgot password?
+          </Link>
         </div>
       </div>
     </div>
   );
-};
-
-export default Login;
+}

@@ -9,6 +9,8 @@ export default function Navbar() {
   const handleLogout = () => {
     setIsAuth(false);
     localStorage.removeItem("token");
+    // Optional: also clear role/user if you store them
+    // localStorage.removeItem("role");
     navigate("/login");
   };
 
@@ -17,44 +19,70 @@ export default function Navbar() {
       className={`${styles.navWrapper} ${theme === "dark" ? styles.dark : ""}`}
     >
       <nav className={styles.glassNav}>
-        {/* Brand with Gradient Text */}
+        {/* Brand */}
         <Link className={styles.brand} to="/">
-          <span style={{ fontSize: "1.2rem" }}>⚡</span>
-          <span>MESSENGER</span>
+          <span className={styles.brandIcon}>⚡</span>
+          <span className={styles.brandText}>MESSENGER</span>
         </Link>
 
-        {/* Navigation Segments */}
+        {/* Main navigation - changes based on auth state */}
         <div className={styles.navGroup}>
-          <NavLink
-            to="/dashboard"
-            className={({ isActive }) =>
-              `${styles.link} ${isActive ? styles.activeLink : ""}`
-            }
-          >
-            Dashboard
-          </NavLink>
-          <NavLink
-            to="/profile"
-            className={({ isActive }) =>
-              `${styles.link} ${isActive ? styles.activeLink : ""}`
-            }
-          >
-            Profile
-          </NavLink>
+          {isAuth ? (
+            <>
+              <NavLink
+                to="/dashboard"
+                className={({ isActive }) =>
+                  `${styles.link} ${isActive ? styles.activeLink : ""}`
+                }
+              >
+                Dashboard
+              </NavLink>
+
+              <NavLink
+                to="/profile"
+                className={({ isActive }) =>
+                  `${styles.link} ${isActive ? styles.activeLink : ""}`
+                }
+              >
+                Profile
+              </NavLink>
+            </>
+          ) : (
+            <>
+              <NavLink
+                to="/login"
+                className={({ isActive }) =>
+                  `${styles.link} ${isActive ? styles.activeLink : ""}`
+                }
+              >
+                Login
+              </NavLink>
+
+              <NavLink
+                to="/register"
+                className={({ isActive }) =>
+                  `${styles.link} ${isActive ? styles.activeLink : ""}`
+                }
+              >
+                Register
+              </NavLink>
+            </>
+          )}
         </div>
 
-        {/* Actions Group */}
+        {/* Right side controls */}
         <div className={styles.controls}>
           <button
             className={styles.iconBtn}
             onClick={toggleTheme}
-            aria-label="Toggle Theme"
+            aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+            title="Toggle theme"
           >
             {theme === "light" ? "🌙" : "☀️"}
           </button>
 
           {isAuth && (
-            <button className={styles.logout} onClick={handleLogout}>
+            <button className={styles.logoutBtn} onClick={handleLogout}>
               Logout
             </button>
           )}
