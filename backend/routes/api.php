@@ -8,7 +8,8 @@ use App\Http\Controllers\AdminController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
-Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])
+    ->name('password.reset');
 
 // Protected routes with auth + throttle
 Route::middleware(['auth:api', 'throttle:60,1'])->group(function () {
