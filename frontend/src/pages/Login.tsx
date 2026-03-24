@@ -2,8 +2,7 @@ import { useState, FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useStore } from "../store/useStore";
-import API from "../api";
-
+import { login } from "../api";
 import styles from "./Login.module.css";
 
 export default function Login() {
@@ -17,19 +16,19 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const res = await API.post("/login", { email, password });
+      const res = await login({ email, password });
       const { token, role } = res.data;
 
       setAuth(token, role);
       toast.success("Welcome back! 👋");
 
-      if (role === "admin") {
-        navigate("/admin/dashboard");
-      } else {
-        navigate("/dashboard");
-      }
+      navigate(role === "admin" ? "/admin/dashboard" : "/dashboard");
     } catch (err: any) {
-      const msg = err?.response?.data?.message || "Invalid credentials";
+      const msg =
+        err?.response?.status === 401
+          ? "The credentials are incorrect."
+          : err?.response?.data?.message || "Login failed. Please try again.";
+
       toast.error(msg);
     }
   };

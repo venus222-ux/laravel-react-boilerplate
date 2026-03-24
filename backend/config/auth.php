@@ -41,9 +41,10 @@ return [
             'provider' => 'users',
         ],
       'api' => [
-        'driver' => 'jwt',  // ✅ USE jwt here
+        'driver' => 'jwt',  // make sure it is 'jwt'
         'provider' => 'users',
-    ],
+        'hash' => false,
+       ],
     ],
 
     /*

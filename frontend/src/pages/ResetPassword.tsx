@@ -1,22 +1,38 @@
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import API from "../api";
 import { toast } from "react-toastify";
+import { useStore } from "../store/useStore";
 
 import styles from "./ResetPassword.module.css";
 
 export default function ResetPassword() {
-  const { token } = useParams();
+  // Try to get token from path or query
+  const { token: tokenParam } = useParams();
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email") || "";
+  const token = searchParams.get("token") || tokenParam || "";
 
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
+  // If token or email missing, show error immediately
+  useEffect(() => {
+    if (!token || !email) {
+      toast.error("Invalid password reset link");
+    }
+  }, [token, email]);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+
+    if (!token || !email) {
+      toast.error("Invalid password reset link");
+      return;
+    }
 
     if (password !== passwordConfirmation) {
       toast.error("Passwords do not match");
@@ -28,6 +44,8 @@ export default function ResetPassword() {
       return;
     }
 
+    setLoading(true);
+
     try {
       await API.post("/reset-password", {
         email,
@@ -36,9 +54,7 @@ export default function ResetPassword() {
         password_confirmation: passwordConfirmation,
       });
 
-      // Clear any stale auth data
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
+      useStore.getState().logout();
 
       toast.success("Password reset successful! Please log in.");
       navigate("/login");
@@ -48,6 +64,8 @@ export default function ResetPassword() {
         err?.response?.data?.error ||
         "Password reset failed. Please try again.";
       toast.error(msg);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -63,7 +81,6 @@ export default function ResetPassword() {
         </p>
 
         <form onSubmit={handleSubmit}>
-          {/* Hidden email field - good for form consistency & accessibility */}
           <input type="hidden" name="email" value={email} />
 
           <div className={styles.formGroup}>
@@ -92,8 +109,8 @@ export default function ResetPassword() {
             />
           </div>
 
-          <button type="submit" className={styles.btn}>
-            Reset Password
+          <button type="submit" className={styles.btn} disabled={loading}>
+            {loading ? "Resetting..." : "Reset Password"}
           </button>
         </form>
       </div>

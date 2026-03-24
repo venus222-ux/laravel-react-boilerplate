@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar";
 import { ToastContainer } from "react-toastify";
 import { useStore } from "./store/useStore";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { refreshToken } from "./api";
 
 const Home = lazy(() => import("./pages/Home"));
 const Login = lazy(() => import("./pages/Login"));
@@ -16,13 +17,33 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 
 const App = () => {
-  const { theme, isAuth, startTokenRefreshLoop } = useStore();
+  const { theme, isAuth, role, initialized, setAuth, logout, setInitialized } =
+    useStore();
 
   useEffect(() => {
     document.documentElement.setAttribute("data-bs-theme", theme);
+  }, [theme]);
 
-    if (isAuth) startTokenRefreshLoop(); // auto refresh if logged in
-  }, [theme, isAuth, startTokenRefreshLoop]);
+  useEffect(() => {
+    const bootstrapAuth = async () => {
+      try {
+        const res = await refreshToken();
+        setAuth(res.data.token, res.data.role);
+      } catch {
+        logout();
+      } finally {
+        setInitialized(true);
+      }
+    };
+
+    bootstrapAuth();
+  }, [setAuth, logout, setInitialized]);
+
+  if (!initialized) {
+    return (
+      <div style={{ textAlign: "center", marginTop: "2rem" }}>Loading...</div>
+    );
+  }
 
   return (
     <BrowserRouter>
@@ -30,10 +51,7 @@ const App = () => {
       <Suspense
         fallback={
           <div style={{ textAlign: "center", marginTop: "2rem" }}>
-            <div className="spinner-border text-primary" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </div>
-            <p>Loading page...</p>
+            Loading page...
           </div>
         }
       >
@@ -44,7 +62,7 @@ const App = () => {
             element={
               !isAuth ? (
                 <Login />
-              ) : useStore.getState().role === "admin" ? (
+              ) : role === "admin" ? (
                 <Navigate to="/admin/dashboard" />
               ) : (
                 <Navigate to="/dashboard" />
@@ -56,7 +74,7 @@ const App = () => {
             element={
               !isAuth ? (
                 <Register />
-              ) : useStore.getState().role === "admin" ? (
+              ) : role === "admin" ? (
                 <Navigate to="/admin/dashboard" />
               ) : (
                 <Navigate to="/dashboard" />
@@ -67,15 +85,20 @@ const App = () => {
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route
             path="/dashboard"
-            element={isAuth ? <Dashboard /> : <Navigate to="/login" />}
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="/profile"
-            element={isAuth ? <Profile /> : <Navigate to="/login" />}
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
           />
-
-          {/* Catch-all route */}
-          <Route path="*" element={<NotFound />} />
           <Route
             path="/admin/dashboard"
             element={
@@ -84,6 +107,7 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
       <ToastContainer position="top-right" autoClose={3000} />

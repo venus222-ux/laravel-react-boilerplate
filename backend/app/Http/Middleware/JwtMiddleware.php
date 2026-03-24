@@ -18,7 +18,12 @@ class JwtMiddleware
                 return response()->json(['message' => 'User not found'], 401);
             }
 
-        } catch (\Exception $e) {
+            $payload = JWTAuth::parseToken()->getPayload();
+
+            if ($payload->get('type') !== 'access') {
+                return response()->json(['message' => 'Invalid access token'], 401);
+            }
+        } catch (\Throwable $e) {
             return response()->json([
                 'message' => 'Unauthorized',
                 'error' => $e->getMessage()

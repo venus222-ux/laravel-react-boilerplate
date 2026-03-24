@@ -1,105 +1,94 @@
 import { create } from "zustand";
-import { refreshToken } from "../api";
+import API from "../api";
 
 interface AppState {
   isAuth: boolean;
   token: string | null;
   role: string | null;
   theme: "light" | "dark";
+  initialized: boolean;
 
   setAuth: (token: string, role: string) => void;
-  setIsAuth: (auth: boolean, token?: string, role?: string) => void;
+  logout: () => void;
   setToken: (token: string | null) => void;
   toggleTheme: () => void;
+  setInitialized: (value: boolean) => void;
+
   startTokenRefreshLoop: () => void;
+  stopTokenRefreshLoop: () => void;
 }
 
-let refreshInterval: ReturnType<typeof setInterval> | null = null;
+export const useStore = create<AppState>((set, get) => {
+  let intervalId: ReturnType<typeof setInterval> | null = null;
 
-export const useStore = create<AppState>((set, get) => ({
-  isAuth: !!localStorage.getItem("token"),
-  token: localStorage.getItem("token"),
-  role: localStorage.getItem("role"),
-  theme: (localStorage.getItem("theme") as "light" | "dark") || "light",
+  return {
+    isAuth: false,
+    token: null,
+    role: null,
+    initialized: false,
+    theme: (localStorage.getItem("theme") as "light" | "dark") || "light",
 
-  // NEW: unified auth setter
-  setAuth: (token, role) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("role", role);
-
-    set({
-      isAuth: true,
-      token,
-      role,
-    });
-  },
-
-  setIsAuth: (auth, token, role) => {
-    if (auth && token) {
-      localStorage.setItem("token", token);
-
-      if (role) {
-        localStorage.setItem("role", role);
-      }
-
+    setAuth: (token, role) =>
       set({
         isAuth: true,
         token,
-        role: role ?? get().role,
-      });
-    } else {
-      localStorage.removeItem("token");
-      localStorage.removeItem("role");
+        role,
+      }),
+
+    logout: () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
 
       set({
         isAuth: false,
         token: null,
         role: null,
       });
+    },
 
-      if (refreshInterval) clearInterval(refreshInterval);
-    }
-  },
+    setToken: (token) =>
+      set((state) => ({
+        token,
+        isAuth: !!token,
+        role: token ? state.role : null,
+      })),
 
-  setToken: (token) => {
-    if (token) {
-      localStorage.setItem("token", token);
-      set({ token });
-    } else {
-      localStorage.removeItem("token");
-      set({ token: null });
-    }
-  },
+    toggleTheme: () => {
+      set((state) => {
+        const newTheme = state.theme === "light" ? "dark" : "light";
+        localStorage.setItem("theme", newTheme);
+        document.documentElement.setAttribute("data-bs-theme", newTheme);
+        return { theme: newTheme };
+      });
+    },
 
-  toggleTheme: () => {
-    set((state) => {
-      const newTheme = state.theme === "light" ? "dark" : "light";
+    setInitialized: (value) => set({ initialized: value }),
 
-      localStorage.setItem("theme", newTheme);
-      document.documentElement.setAttribute("data-bs-theme", newTheme);
+    stopTokenRefreshLoop: () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    },
 
-      return { theme: newTheme };
-    });
-  },
+    startTokenRefreshLoop: () => {
+      if (intervalId) return; // prevent duplicate interval
 
-  startTokenRefreshLoop: () => {
-    if (refreshInterval) return;
+      const refreshInterval = 1000 * 60 * 10; // 10 min
 
-    refreshInterval = setInterval(
-      async () => {
-        if (!localStorage.getItem("token")) return;
-
+      intervalId = setInterval(async () => {
         try {
-          const res = await refreshToken();
-          const newToken = res.data.token;
+          const res = await API.post("/refresh");
 
-          get().setToken(newToken);
-        } catch {
-          get().setIsAuth(false);
-          window.location.replace("/login");
+          const { token, role } = res.data;
+          get().setAuth(token, role);
+        } catch (err) {
+          console.error("Failed to refresh token:", err);
+          get().logout();
         }
-      },
-      4 * 60 * 1000,
-    );
-  },
-}));
+      }, refreshInterval);
+    },
+  };
+});

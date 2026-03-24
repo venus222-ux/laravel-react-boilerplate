@@ -1,8 +1,8 @@
 import { useState, FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import API from "../api";
 import { toast } from "react-toastify";
-
+import { register } from "../api";
+import { useStore } from "../store/useStore";
 import styles from "./Register.module.css";
 
 interface FormData {
@@ -19,9 +19,12 @@ export default function Register() {
     password: "",
     password_confirmation: "",
   });
-
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
+  const setAuth = useStore((state) => state.setAuth);
+
+  const passwordsMatch = form.password === form.password_confirmation;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -30,7 +33,7 @@ export default function Register() {
   const handleRegister = async (e: FormEvent) => {
     e.preventDefault();
 
-    if (form.password !== form.password_confirmation) {
+    if (!passwordsMatch) {
       toast.error("Passwords do not match");
       return;
     }
@@ -43,19 +46,13 @@ export default function Register() {
     setLoading(true);
 
     try {
-      const response = await API.post("/register", form);
+      const response = await register(form);
+      const { token, role } = response.data;
 
-      if (response.data.token) {
-        localStorage.setItem("token", response.data.token);
-        toast.success("Registration successful! Redirecting...");
-        setTimeout(() => navigate("/dashboard"), 1500);
-      } else {
-        toast.success("Registration successful! Please login.");
-        setTimeout(() => navigate("/login"), 1500);
-      }
+      setAuth(token, role);
+      toast.success("Registration successful!");
+      navigate(role === "admin" ? "/admin/dashboard" : "/dashboard");
     } catch (error: any) {
-      console.error("Registration failed:", error);
-
       if (error.response?.data?.errors) {
         const errors = error.response.data.errors;
         Object.keys(errors).forEach((key) => {
@@ -71,9 +68,6 @@ export default function Register() {
     }
   };
 
-  const passwordsMatch =
-    form.password === form.password_confirmation || !form.password_confirmation;
-
   return (
     <div className={styles.wrapper}>
       <div className={styles.card}>
@@ -85,6 +79,7 @@ export default function Register() {
         </div>
 
         <form onSubmit={handleRegister}>
+          {/* Name */}
           <div className={styles.formGroup}>
             <label className={styles.label}>Full Name</label>
             <input
@@ -98,6 +93,7 @@ export default function Register() {
             />
           </div>
 
+          {/* Email */}
           <div className={styles.formGroup}>
             <label className={styles.label}>Email Address</label>
             <input
@@ -112,6 +108,7 @@ export default function Register() {
             />
           </div>
 
+          {/* Password */}
           <div className={styles.formGroup}>
             <label className={styles.label}>Password</label>
             <input
@@ -127,6 +124,7 @@ export default function Register() {
             />
           </div>
 
+          {/* Confirm Password with live feedback */}
           <div className={styles.formGroup}>
             <label className={styles.label}>Confirm Password</label>
             <input
@@ -139,11 +137,20 @@ export default function Register() {
               required
               autoComplete="new-password"
             />
-            {!passwordsMatch && form.password_confirmation && (
-              <span className={styles.error}>Passwords do not match</span>
+            {form.password_confirmation && (
+              <>
+                {passwordsMatch ? (
+                  <span className={styles.success}>✅ Passwords match</span>
+                ) : (
+                  <span className={styles.error}>
+                    ❌ Passwords do not match
+                  </span>
+                )}
+              </>
             )}
           </div>
 
+          {/* Submit */}
           <button type="submit" className={styles.btn} disabled={loading}>
             {loading ? (
               <>

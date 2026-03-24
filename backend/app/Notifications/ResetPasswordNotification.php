@@ -23,8 +23,7 @@ class ResetPasswordNotification extends Notification implements ShouldQueue
     }
 
     public function toMail($notifiable) {
-        $url = url("http://localhost:5173/reset-password/{$this->token}?email={$notifiable->email}");
-
+$url = rtrim(env('FRONTEND_URL', 'http://localhost:5173'), '/') . "/reset-password/{$this->token}?email={$notifiable->email}";
         return (new MailMessage)
             ->subject('Reset Your Password')
             ->greeting("Hello {$notifiable->name},")

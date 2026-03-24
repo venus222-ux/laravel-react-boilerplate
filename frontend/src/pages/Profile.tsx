@@ -24,7 +24,7 @@ const Profile = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const setIsAuth = useStore((state) => state.setIsAuth);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     API.get("/profile")
@@ -53,22 +53,20 @@ const Profile = () => {
       );
   };
 
-  const handleDelete = () => {
-    if (
-      !window.confirm(
-        "Are you sure? This will permanently delete your account.",
-      )
-    )
-      return;
+  const handleDelete = async () => {
+    if (!window.confirm("Are you sure?")) return;
 
-    API.delete("/profile")
-      .then(() => {
-        toast.success("Account deleted");
-        setIsAuth(false);
-        localStorage.removeItem("token");
-        window.location.replace("/login");
-      })
-      .catch(() => toast.error("Failed to delete account"));
+    setDeleting(true);
+    try {
+      await API.delete("/profile");
+      toast.success("Account deleted");
+      useStore.getState().logout();
+      window.location.replace("/login");
+    } catch {
+      toast.error("Failed to delete account");
+    } finally {
+      setDeleting(false);
+    }
   };
 
   if (loading)
@@ -157,8 +155,12 @@ const Profile = () => {
           Once you delete your account, there is no going back. Please be
           certain.
         </p>
-        <button className={styles.btnDanger} onClick={handleDelete}>
-          Delete Account
+        <button
+          className={styles.btnDanger}
+          onClick={handleDelete}
+          disabled={deleting}
+        >
+          {deleting ? "Deleting..." : "Delete Account"}
         </button>
       </div>
     </div>

@@ -1,17 +1,20 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useStore } from "../store/useStore";
+import { logoutRequest } from "../api";
 import styles from "./Navbar.module.css";
 
 export default function Navbar() {
-  const { isAuth, setIsAuth, theme, toggleTheme } = useStore();
+  const { isAuth, logout, theme, toggleTheme } = useStore();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    setIsAuth(false);
-    localStorage.removeItem("token");
-    // Optional: also clear role/user if you store them
-    // localStorage.removeItem("role");
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      await logoutRequest();
+    } catch {
+    } finally {
+      logout();
+      navigate("/login");
+    }
   };
 
   return (
@@ -19,13 +22,11 @@ export default function Navbar() {
       className={`${styles.navWrapper} ${theme === "dark" ? styles.dark : ""}`}
     >
       <nav className={styles.glassNav}>
-        {/* Brand */}
         <Link className={styles.brand} to="/">
           <span className={styles.brandIcon}>⚡</span>
           <span className={styles.brandText}>MESSENGER</span>
         </Link>
 
-        {/* Main navigation - changes based on auth state */}
         <div className={styles.navGroup}>
           {isAuth ? (
             <>
@@ -70,7 +71,6 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Right side controls */}
         <div className={styles.controls}>
           <button
             className={styles.iconBtn}
