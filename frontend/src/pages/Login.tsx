@@ -29,10 +29,24 @@ export default function Login() {
 
       navigate(role === "admin" ? "/admin/dashboard" : "/dashboard");
     } catch (err: any) {
-      const msg =
-        err?.response?.status === 401
-          ? "The credentials are incorrect."
-          : err?.response?.data?.message || "Login failed. Please try again.";
+      console.error(err);
+
+      let msg = "Login failed. Please try again.";
+
+      if (err.response) {
+        // The request was made and the server responded with a status code outside 2xx
+        if (err.response.status === 401) {
+          msg = "The credentials are incorrect.";
+        } else if (err.response.data?.message) {
+          msg = err.response.data.message;
+        }
+      } else if (err.request) {
+        // Request was made but no response received
+        msg = "Network error. Please check your connection.";
+      } else {
+        // Something else happened
+        msg = err.message || msg;
+      }
 
       toast.error(msg);
     }

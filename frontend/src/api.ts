@@ -97,10 +97,16 @@ API.interceptors.response.use(
 
     const isRefreshCall = originalRequest.url?.includes("/refresh");
 
+    // ✅ ADD THIS
+    const isAuthRoute =
+      originalRequest.url?.includes("/login") ||
+      originalRequest.url?.includes("/register");
+
     if (
       err.response?.status === 401 &&
       !originalRequest._retry &&
-      !isRefreshCall
+      !isRefreshCall &&
+      !isAuthRoute // ✅ now it works
     ) {
       if (isRefreshing) {
         return new Promise<string>((resolve, reject) => {
