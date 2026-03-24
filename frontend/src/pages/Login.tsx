@@ -11,6 +11,9 @@ export default function Login() {
 
   const navigate = useNavigate();
   const setAuth = useStore((state) => state.setAuth);
+  const startTokenRefreshLoop = useStore(
+    (state) => state.startTokenRefreshLoop,
+  );
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
@@ -20,6 +23,8 @@ export default function Login() {
       const { token, role } = res.data;
 
       setAuth(token, role);
+      startTokenRefreshLoop();
+
       toast.success("Welcome back! 👋");
 
       navigate(role === "admin" ? "/admin/dashboard" : "/dashboard");

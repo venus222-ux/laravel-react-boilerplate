@@ -74,15 +74,15 @@ export const useStore = create<AppState>((set, get) => {
     },
 
     startTokenRefreshLoop: () => {
-      if (intervalId) return; // prevent duplicate interval
+      if (intervalId) return;
 
       const refreshInterval = 1000 * 60 * 10; // 10 min
 
       intervalId = setInterval(async () => {
         try {
           const res = await API.post("/refresh");
-
           const { token, role } = res.data;
+
           get().setAuth(token, role);
         } catch (err) {
           console.error("Failed to refresh token:", err);
