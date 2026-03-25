@@ -11,11 +11,22 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
     // ==================== TOKEN HELPERS ====================
 
+  protected function storeRefreshToken(User $user, string $token)
+{
+    DB::table('refresh_tokens')->insert([
+        'user_id' => $user->id,
+        'token_hash' => hash('sha256', $token),
+        'expires_at' => now()->addDays(14),
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+}
     /**
      * Generate an access token for the user.
      */
@@ -111,7 +122,7 @@ class AuthController extends Controller
      * Authenticate a user and return tokens.
      */
     public function login(Request $request)
-{
+   {
     $credentials = $request->validate([
         'email'    => 'required|email',
         'password' => 'required',
@@ -126,16 +137,16 @@ class AuthController extends Controller
     $user = auth('api')->user();
     Cache::put("user-is-online-{$user->id}", true, now()->addMinutes(5));
 
-    $accessToken  = $this->makeAccessToken($user);
-    $refreshToken = $this->makeRefreshToken($user);
+$accessToken  = $this->makeAccessToken($user);
+$refreshToken = $this->makeRefreshToken($user);
 
-    return response()->json([
-        'token'      => $accessToken,
-        'role'       => $user->getRoleNames()->first(),
-        'token_type' => 'bearer',
-        'expires_in' => JWTAuth::factory()->getTTL() * 60,
-    ])->cookie($this->refreshCookie($refreshToken));
- }
+$this->storeRefreshToken($user, $refreshToken);
+
+return response()->json([
+    'token' => $accessToken,
+    'role' => $user->getRoleNames()->first(),
+])->cookie($this->refreshCookie($refreshToken));
+   }
 
 
     // ==================== TOKEN REFRESH ====================
@@ -143,15 +154,9 @@ class AuthController extends Controller
     /**
      * Refresh the access token using a valid refresh token from cookie.
      */
-    public function refresh(Request $request)
+   public function refresh(Request $request)
 {
     $refreshToken = $request->cookie('refresh_token');
-
-    Log::info('=== REFRESH DEBUG ===', [
-        'has_refresh_cookie' => !!$refreshToken,
-        'all_cookies' => $request->cookies->all(),
-        'headers' => $request->headers->all(),
-    ]);
 
     if (!$refreshToken) {
         return response()->json(['message' => 'No refresh token'], 401);
@@ -160,7 +165,6 @@ class AuthController extends Controller
     try {
         $payload = JWTAuth::setToken($refreshToken)->getPayload();
 
-        // Check type
         if ($payload->get('type') !== 'refresh') {
             return response()->json(['message' => 'Invalid token type'], 401);
         }
@@ -170,30 +174,70 @@ class AuthController extends Controller
             return response()->json(['message' => 'User not found'], 401);
         }
 
+        $tokenHash = hash('sha256', $refreshToken);
+
+        $storedToken = DB::table('refresh_tokens')
+            ->where('token_hash', $tokenHash)
+            ->where('revoked', false)
+            ->first();
+
+        // ❌ TOKEN REUSE DETECTED
+        if (!$storedToken) {
+            // revoke ALL tokens for safety
+            DB::table('refresh_tokens')
+                ->where('user_id', $user->id)
+                ->update(['revoked' => true]);
+
+            return response()->json(['message' => 'Token reuse detected'], 401);
+        }
+
+        // ❌ EXPIRED
+        if (now()->greaterThan($storedToken->expires_at)) {
+            return response()->json(['message' => 'Token expired'], 401);
+        }
+
+        // ✅ ROTATE TOKEN
+        DB::table('refresh_tokens')
+            ->where('id', $storedToken->id)
+            ->update(['revoked' => true]);
+
+        $newRefreshToken = $this->makeRefreshToken($user);
+        $this->storeRefreshToken($user, $newRefreshToken);
+
         $accessToken = $this->makeAccessToken($user);
 
         return response()->json([
             'token' => $accessToken,
             'role' => $user->getRoleNames()->first(),
-        ]);
-    } catch (\Exception $e) {
-        return response()->json(['message' => 'Invalid refresh token'], 401);
-    }
-}
+        ])->cookie($this->refreshCookie($newRefreshToken));
 
+     } catch (\Exception $e) {
+        return response()->json(['message' => 'Invalid refresh token'], 401);
+     }
+   }
     // ==================== LOGOUT ====================
 
     /**
      * Log out the authenticated user.
      */
-    public function logout()
-    {
-        auth()->logout();
 
-        return response()->json([
-            'message' => 'Logged out successfully',
-        ])->cookie($this->clearRefreshCookie());
+    public function logout()
+{
+    $user = auth()->user();
+
+    if ($user) {
+        DB::table('refresh_tokens')
+            ->where('user_id', $user->id)
+            ->update(['revoked' => true]);
     }
+
+    auth()->logout();
+
+    return response()->json([
+        'message' => 'Logged out successfully',
+    ])->cookie($this->clearRefreshCookie());
+}
+
 
     // ==================== PROFILE MANAGEMENT ====================
 

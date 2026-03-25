@@ -11,7 +11,7 @@ class UserSeeder extends Seeder
     public function run()
     {
         // Reset all normal users, but keep admin
-        DB::table('users')->where('email', '!=', 'admin@example.com')->truncate();
+        DB::table('users')->where('email', '!=', 'admin@example.com')->delete();
 
         // Create normal users
         User::factory()->create([

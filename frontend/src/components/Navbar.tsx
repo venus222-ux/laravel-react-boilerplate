@@ -4,8 +4,21 @@ import { logoutRequest } from "../api";
 import styles from "./Navbar.module.css";
 
 export default function Navbar() {
-  const { isAuth, logout, theme, toggleTheme } = useStore();
+  const { isAuth, initialized, logout, theme, toggleTheme } = useStore();
   const navigate = useNavigate();
+
+  if (!initialized) {
+    // optional: show empty navbar, spinner, or skeleton
+    return (
+      <div
+        className={`${styles.navWrapper} ${theme === "dark" ? styles.dark : ""}`}
+      >
+        <nav className={styles.glassNav}>
+          <span>Loading...</span>
+        </nav>
+      </div>
+    );
+  }
 
   const handleLogout = async () => {
     try {
