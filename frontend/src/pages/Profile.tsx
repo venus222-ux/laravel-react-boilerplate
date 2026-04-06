@@ -29,8 +29,9 @@ const Profile = () => {
   useEffect(() => {
     API.get("/profile")
       .then((res) => {
-        setProfile(res.data);
-        setFormData((prev) => ({ ...prev, email: res.data.email || "" }));
+        const userData = res.data.data; // ← get the `data` key
+        setProfile(userData);
+        setFormData((prev) => ({ ...prev, email: userData.email || "" }));
         setLoading(false);
       })
       .catch(() => {
