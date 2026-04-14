@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\RegisterRequest;
-use App\Http\Requests\LoginRequest;
+use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\UpdateProfileRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
-use App\Http\Resources\Auth\UserResource;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Services\AuthService;
 use App\Events\Auth\UserRegistered;
 use App\Events\Auth\UserLoggedIn;
 use App\Events\Auth\PasswordResetRequested;
+use App\Http\Requests\UpdateProfileRequest as RequestsUpdateProfileRequest;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
