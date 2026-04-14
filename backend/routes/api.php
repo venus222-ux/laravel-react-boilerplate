@@ -31,4 +31,4 @@ Route::middleware(['auth:api','app.admin'])->group(function () {
 
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
 
-});
+}); 

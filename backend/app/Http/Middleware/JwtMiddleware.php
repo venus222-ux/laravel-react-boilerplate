@@ -23,10 +23,13 @@ class JwtMiddleware
             if ($payload->get('type') !== 'access') {
                 return response()->json(['message' => 'Invalid access token'], 401);
             }
+
+            // ✅ IMPORTANT: set user globally
+            auth()->setUser($user);
+
         } catch (\Throwable $e) {
             return response()->json([
-                'message' => 'Unauthorized',
-                'error' => $e->getMessage()
+                'message' => 'Unauthorized'
             ], 401);
         }
 

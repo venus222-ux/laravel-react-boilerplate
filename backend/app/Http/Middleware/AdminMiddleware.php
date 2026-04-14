@@ -9,12 +9,27 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
-        if (!$request->user()->hasRole('admin')) {
-            return response()->json([
-                'message' => 'Unauthorized'
-            ], 403);
+        $user = auth()->user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        if (!$user->hasRole('admin')) {
+            return response()->json(['message' => 'Forbidden'], 403);
         }
 
         return $next($request);
     }
 }
+
+
+/***
+ * Request
+   ↓
+JwtMiddleware (auth)
+   ↓  sets auth()->user()
+AdminMiddleware (role check)
+   ↓
+Controller
+ */
