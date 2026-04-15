@@ -16,8 +16,10 @@ use App\Http\Requests\UpdateProfileRequest as RequestsUpdateProfileRequest;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Services\ActivityLogger;
 
 class AuthController extends Controller
 {
@@ -67,31 +69,48 @@ class AuthController extends Controller
 
     // ================= LOGIN =================
 
-    public function login(LoginRequest $request, AuthService $authService)
-    {
-        $user = $authService->attemptLogin($request->validated());
+ public function login(LoginRequest $request, AuthService $authService)
+{
+    $credentials = $request->validated();
 
-        if (!$user) {
-            return response()->json(['message' => 'Invalid credentials'], 401);
-        }
+    $user = $authService->attemptLogin($credentials);
 
-        event(new UserLoggedIn($user));
-        $authService->markOnline($user);
+    if (!$user) {
+        // log failed login attempt
+        ActivityLogger::log([
+            'user_id' => null,
+            'email'   => $credentials['email'] ?? null,
+            'action'  => 'login.failed',
+            'status'  => 'error',
+        ]);
 
-        $accessToken  = $authService->makeAccessToken($user);
-        $refreshToken = $authService->makeRefreshToken($user);
-
-        $authService->storeRefreshToken($user, $refreshToken);
-
-        return (new UserResource($user))
-            ->additional([
-                'token' => $accessToken,
-                'role'  => $user->getRoleNames()->first(),
-            ])
-            ->response()
-            ->cookie($this->refreshCookie($refreshToken));
+        return response()->json(['message' => 'Invalid credentials'], 401);
     }
 
+    // log successful login
+    ActivityLogger::log([
+        'user_id' => $user->id,
+        'email'   => $user->email,
+        'action'  => 'login.success',
+        'status'  => 'success',
+    ]);
+
+    event(new UserLoggedIn($user));
+    $authService->markOnline($user);
+
+    $accessToken  = $authService->makeAccessToken($user);
+    $refreshToken = $authService->makeRefreshToken($user);
+
+    $authService->storeRefreshToken($user, $refreshToken);
+
+    return (new UserResource($user))
+        ->additional([
+            'token' => $accessToken,
+            'role'  => $user->getRoleNames()->first(),
+        ])
+        ->response()
+        ->cookie($this->refreshCookie($refreshToken));
+}
     // ================= REFRESH =================
 
     public function refresh(Request $request, AuthService $authService)
@@ -116,15 +135,13 @@ class AuthController extends Controller
             }
 
             $stored = DB::table('refresh_tokens')
-                ->where('token_hash', hash('sha256', $refreshToken))
-                ->where('revoked', false)
-                ->first();
+              ->where('token_hash', hash('sha256', $refreshToken))
+              ->first();
 
-            if (!$stored) {
-                $authService->revokeUserTokens($user);
-                return response()->json(['message' => 'Token reuse detected'], 401);
+           if (!$stored || $stored->revoked) {
+             $authService->revokeUserTokens($user);
+             return response()->json(['message' => 'Token reuse detected'], 401);
             }
-
             if (now()->greaterThan($stored->expires_at)) {
                 return response()->json(['message' => 'Token expired'], 401);
             }
@@ -257,7 +274,7 @@ class AuthController extends Controller
     $user = User::where('email', $data['email'])->first();
 
     $user->update([
-        'password' => bcrypt($data['password'])
+        'password' => Hash::make($data['password'])
     ]);
 
     DB::table('password_resets')

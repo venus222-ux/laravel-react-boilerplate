@@ -4,7 +4,7 @@ import API from "../api";
 import { toast } from "react-toastify";
 import { useStore } from "../store/useStore";
 
-import styles from "./ResetPassword.module.css";
+import styles from "../styles/ResetPassword.module.css";
 
 export default function ResetPassword() {
   // Try to get token from path or query

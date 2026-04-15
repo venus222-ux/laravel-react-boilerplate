@@ -27,8 +27,12 @@ Route::middleware(['jwt.auth'])->group(function () {
 });
 
 
-Route::middleware(['auth:api','app.admin'])->group(function () {
+// routes/api.php
 
-    Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
-
-}); 
+Route::prefix('admin')
+    ->middleware(['auth.jwt', 'role:admin'])
+    ->group(function () {
+        Route::get('/dashboard', [AdminController::class, 'dashboard']);
+        Route::get('/users', [AdminController::class, 'users']); // READ
+        Route::delete('/users/{id}', [AdminController::class, 'deleteUser']); // DELETE
+});

@@ -2,7 +2,7 @@ import { useEffect, useState, ChangeEvent, FormEvent } from "react";
 import API from "../api";
 import { toast } from "react-toastify";
 import { useStore } from "../store/useStore";
-import styles from "./Profile.module.css";
+import styles from "../styles/Profile.module.css";
 
 interface ProfileData {
   email: string;

@@ -28,9 +28,10 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         // JWT alias 👇
-        $middleware->alias([
-            'auth.jwt' => \App\Http\Middleware\JwtMiddleware::class,
-        ]);
+       $middleware->alias([
+        'auth.jwt' => \App\Http\Middleware\JwtMiddleware::class,
+         'role'     => \App\Http\Middleware\AdminMiddleware::class,
+       ]);
     })
 
     ->withExceptions(function (Exceptions $exceptions): void {

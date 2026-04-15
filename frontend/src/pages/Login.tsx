@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useStore } from "../store/useStore";
 import { login } from "../api";
-import styles from "./Login.module.css";
+import styles from "../styles/Login.module.css";
 
 export default function Login() {
   const [email, setEmail] = useState("");

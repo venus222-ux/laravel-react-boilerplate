@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import API from "../api";
 import { toast } from "react-toastify";
 
-import styles from "./ForgotPassword.module.css";
+import styles from "../styles/ForgotPassword.module.css";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");

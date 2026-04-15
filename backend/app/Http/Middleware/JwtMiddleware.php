@@ -12,13 +12,15 @@ class JwtMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         try {
-            $user = JWTAuth::parseToken()->authenticate();
+           $token = JWTAuth::parseToken();
+
+           $user = $token->authenticate();
 
             if (!$user) {
                 return response()->json(['message' => 'User not found'], 401);
             }
 
-            $payload = JWTAuth::parseToken()->getPayload();
+            $payload = $token->getPayload();
 
             if ($payload->get('type') !== 'access') {
                 return response()->json(['message' => 'Invalid access token'], 401);

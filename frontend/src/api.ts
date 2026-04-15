@@ -79,6 +79,7 @@ API.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 
   // Only attach access token for normal requests
   const token = useStore.getState().token;
+  console.log("TOKEN IN STORE:", token);
   if (token && !config.url?.includes("/refresh")) {
     config.headers.Authorization = `Bearer ${token}`;
   }
