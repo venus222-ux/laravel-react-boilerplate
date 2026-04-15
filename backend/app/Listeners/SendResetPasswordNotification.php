@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Events\Auth\PasswordResetRequested as AuthPasswordResetRequested;
 use App\Events\PasswordResetRequested;
 use App\Notifications\ResetPasswordNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -14,7 +15,7 @@ class SendResetPasswordNotification implements ShouldQueue
     /**
      * Handle the event.
      */
-    public function handle(PasswordResetRequested $event): void
+    public function handle(AuthPasswordResetRequested $event): void
     {
         $event->user->notify(
             new ResetPasswordNotification($event->token)

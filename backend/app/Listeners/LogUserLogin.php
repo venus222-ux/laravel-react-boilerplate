@@ -2,7 +2,8 @@
 
 namespace App\Listeners;
 
-use App\Events\UserLoggedIn;
+use App\Events\Auth\UserLoggedIn as AuthUserLoggedIn;
+use App\Events\Auth\UserLoggedIn;
 use Illuminate\Support\Facades\Log;
 
 class LogUserLogin
@@ -10,7 +11,7 @@ class LogUserLogin
     /**
      * Handle the event.
      */
-    public function handle(UserLoggedIn $event): void
+    public function handle( UserLoggedIn $event): void
     {
         Log::info('User logged in', [
             'user_id' => $event->user->id,
