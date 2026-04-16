@@ -5,9 +5,9 @@ namespace App\Providers;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 // Events
-use App\Events\UserRegistered;
-use App\Events\UserLoggedIn;
-use App\Events\PasswordResetRequested;
+use App\Events\Auth\UserRegistered;
+use App\Events\Auth\UserLoggedIn;
+use App\Events\Auth\PasswordResetRequested;
 
 // Listeners
 use App\Listeners\SendWelcomeEmail;

@@ -3,7 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\Auth\PasswordResetRequested as AuthPasswordResetRequested;
-use App\Events\PasswordResetRequested;
+use App\Events\Auth\PasswordResetRequested;
 use App\Notifications\ResetPasswordNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
