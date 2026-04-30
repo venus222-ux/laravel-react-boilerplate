@@ -1,4 +1,8 @@
-✅ 1. Set Up Laravel Backend
+Laravel_react_boilerplate\
+├── backend/ # Laravel 12 API
+└── frontend/ # React + Vite + TS SPA
+
+✅ 2. Set Up Laravel Backend
 cd backend
 cp .env.example .env
 composer install
@@ -11,14 +15,12 @@ php artisan jwt:secret
 php artisan config:clear
 php artisan config:cache
 
-php artisan queue:work
-
-✅ 2. Set Up React Frontend
+✅ 3. Set Up React Frontend
 cd ../frontend
 cp .env.example .env
 npm install
+npm run dev
 
-✅ 3.
-In the root directory run:
+✅ 4. Run in the root project:
 npm run dev
 docker-compose up -d
