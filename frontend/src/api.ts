@@ -4,6 +4,14 @@ import axios, {
   InternalAxiosRequestConfig,
 } from "axios";
 import { useStore } from "./store/useStore";
+import type {
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  ProfileData,
+  ProfileUpdateRequest,
+  APIMessageResponse,
+} from "./types";
 
 type FailedQueueItem = {
   resolve: (token: string) => void;
@@ -13,50 +21,6 @@ type FailedQueueItem = {
 type RetryableRequestConfig = InternalAxiosRequestConfig & {
   _retry?: boolean;
 };
-
-export type Role = "user" | "moderator" | "admin" | null;
-
-export interface User {
-  id: number;
-  name: string;
-  email?: string;
-  role?: Role | string;
-}
-
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface LoginResponse {
-  token: string;
-  role: string;
-  token_type?: string;
-  expires_in?: number;
-}
-
-export interface RegisterRequest {
-  name: string;
-  email: string;
-  password: string;
-  password_confirmation: string;
-}
-
-export interface ProfileData {
-  name?: string;
-  email: string;
-  created_at?: string;
-}
-
-export interface ProfileUpdateRequest {
-  email: string;
-  password?: string;
-  password_confirmation?: string;
-}
-
-export interface APIMessageResponse {
-  message: string;
-}
 
 const API: AxiosInstance = axios.create({
   baseURL: "http://localhost:8000/api",

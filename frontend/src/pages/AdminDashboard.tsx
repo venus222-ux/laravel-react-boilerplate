@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
 import API from "../api";
-import { DashboardData } from "../types/ActivityLog";
 import styles from "../styles/AdminDashboard.module.css";
 import Sidebar from "../components/AdminDashboard/Sidebar";
 import ActivityTable from "../components/AdminDashboard/ActivityTable";
 
-type TabType = "home" | "logs" | "users";
+import type { DashboardData, User, TabType } from "../types";
 
 export default function AdminDashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [currentTab, setCurrentTab] = useState<TabType>("home");
 

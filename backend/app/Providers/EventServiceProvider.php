@@ -3,43 +3,46 @@
 namespace App\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Event;
 
-// Events
+use App\Events\Auth\PasswordResetRequested;
 use App\Events\Auth\UserRegistered;
 use App\Events\Auth\UserLoggedIn;
-use App\Events\Auth\PasswordResetRequested;
 
-// Listeners
+use App\Listeners\SendResetPasswordNotification;
 use App\Listeners\SendWelcomeEmail;
 use App\Listeners\LogUserLogin;
-use App\Listeners\SendResetPasswordNotification;
 
 class EventServiceProvider extends ServiceProvider
 {
-    /**
-     * The event listener mappings for the application.
-     *
-     * @var array<class-string, array<int, class-string>>
-     */
     protected $listen = [
-        UserRegistered::class => [
-            SendWelcomeEmail::class,
-        ],
-
-        UserLoggedIn::class => [
-            LogUserLogin::class,
-        ],
-
-        PasswordResetRequested::class => [
-            SendResetPasswordNotification::class,
-        ],
+        UserRegistered::class => [SendWelcomeEmail::class],
+        UserLoggedIn::class   => [LogUserLogin::class],
+        // PasswordResetRequested is handled manually below
     ];
 
-    /**
-     * Register any events for your application.
-     */
     public function boot(): void
     {
         parent::boot();
+
+        // === CRITICAL: Disable discovery completely ===
+        static::disableEventDiscovery();
+
+        // Remove any existing registrations for this event
+        Event::forget(PasswordResetRequested::class);
+
+        // Register exactly once
+        Event::listen(
+            PasswordResetRequested::class,
+            SendResetPasswordNotification::class
+        );
+    }
+
+    /**
+     * Explicitly disable discovery
+     */
+    public function shouldDiscoverEvents(): bool
+    {
+        return false;
     }
 }

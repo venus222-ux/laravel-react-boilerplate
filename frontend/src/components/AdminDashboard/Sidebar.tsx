@@ -1,8 +1,9 @@
 import styles from "../../styles/AdminDashboard.module.css";
+import type { TabType } from "../../types";
 
 interface SidebarProps {
-  currentTab: string;
-  setCurrentTab: (tab: any) => void;
+  currentTab: TabType;
+  setCurrentTab: React.Dispatch<React.SetStateAction<TabType>>;
 }
 
 export default function Sidebar({ currentTab, setCurrentTab }: SidebarProps) {
@@ -16,6 +17,7 @@ export default function Sidebar({ currentTab, setCurrentTab }: SidebarProps) {
         >
           📊 Dashboard
         </div>
+        f
         <div
           className={`${styles.navItem} ${currentTab === "logs" ? styles.activeNavItem : ""}`}
           onClick={() => setCurrentTab("logs")}

@@ -1,22 +1,6 @@
 import { create } from "zustand";
 import API from "../api";
-
-interface AppState {
-  isAuth: boolean;
-  token: string | null;
-  role: string | null;
-  theme: "light" | "dark";
-  initialized: boolean;
-
-  setAuth: (token: string, role: string) => void;
-  logout: () => void;
-  setToken: (token: string | null) => void;
-  toggleTheme: () => void;
-  setInitialized: (value: boolean) => void;
-
-  startTokenRefreshLoop: () => void;
-  stopTokenRefreshLoop: () => void;
-}
+import type { AppState } from "../types";
 
 export const useStore = create<AppState>((set, get) => {
   let intervalId: ReturnType<typeof setInterval> | null = null;

@@ -1,10 +1,11 @@
 import styles from "../../styles/AdminDashboard.module.css";
+import type { ActivityLog } from "../../types";
 
-export default function ActivityTable({ activities }: { activities: any[] }) {
-  if (activities.length === 0) {
-    return <div className={styles.noData}>No recent activity found.</div>;
-  }
+interface ActivityTableProps {
+  activities: ActivityLog[];
+}
 
+export default function ActivityTable({ activities }: ActivityTableProps) {
   return (
     <div className={styles.tableWrapper}>
       <div className={styles.tableHeader}>System Activity Logs</div>
