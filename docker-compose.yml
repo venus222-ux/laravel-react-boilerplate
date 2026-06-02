@@ -1,4 +1,5 @@
 services:
+  # Redis Service
   redis:
     image: redis:7
     container_name: boilerplate_redis
@@ -8,6 +9,7 @@ services:
     volumes:
       - redis_data:/data
 
+  # Elasticsearch Service
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.19.10
     container_name: boilerplate_elasticsearch
@@ -30,6 +32,26 @@ services:
     volumes:
       - es_data:/usr/share/elasticsearch/data
     restart: unless-stopped
+
+  # Horizon Worker Service
+  laravel_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: boilerplate_worker
+    restart: unless-stopped
+    volumes:
+      - ./backend:/var/www/html
+    depends_on:
+      - redis
+    environment:
+      - QUEUE_CONNECTION=redis
+      - REDIS_HOST=boilerplate_redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - REDIS_CACHE_DB=0
+      - APP_ENV=local
+      - APP_NAME=Laravel
 
 volumes:
   redis_data:

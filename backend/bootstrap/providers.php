@@ -2,10 +2,6 @@
 
 return [
     App\Providers\AppServiceProvider::class,
-    // App\Providers\AuthServiceProvider::class,
-    // App\Providers\EventServiceProvider::class,
-    // App\Providers\RouteServiceProvider::class,
-
-    // Add this line:
+    App\Providers\HorizonServiceProvider::class,
     App\Providers\JWTServiceProvider::class,
 ];
