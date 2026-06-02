@@ -1,8 +1,10 @@
+// pages/AdminDashboard.tsx (or wherever it is)
 import { useEffect, useState } from "react";
 import API from "../api";
 import styles from "../styles/AdminDashboard.module.css";
 import Sidebar from "../components/AdminDashboard/Sidebar";
 import ActivityTable from "../components/AdminDashboard/ActivityTable";
+import TrafficDashboard from "../components/AdminDashboard/TrafficDashboard";
 
 import type { DashboardData, User, TabType } from "../types";
 
@@ -12,7 +14,7 @@ export default function AdminDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [currentTab, setCurrentTab] = useState<TabType>("home");
 
-  // Fetch Dashboard Stats & Logs
+  // Fetch main dashboard stats
   useEffect(() => {
     API.get("/admin/dashboard")
       .then((res) => setData(res.data))
@@ -21,7 +23,7 @@ export default function AdminDashboard() {
       );
   }, []);
 
-  // Fetch users when the "users" tab is clicked
+  // Fetch users when "users" tab is selected
   useEffect(() => {
     if (currentTab === "users") {
       fetchUsers();
@@ -39,10 +41,8 @@ export default function AdminDashboard() {
 
   const handleDeleteUser = async (id: number) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
-
     try {
       await API.delete(`/admin/users/${id}`);
-      // Update local state to remove the user
       setUsers(users.filter((user) => user.id !== id));
     } catch (err: any) {
       alert(err.response?.data?.message || "Delete failed");
@@ -58,20 +58,19 @@ export default function AdminDashboard() {
       <Sidebar currentTab={currentTab} setCurrentTab={setCurrentTab} />
 
       <main className={styles.mainContent}>
-        {/* HOME TAB - Pure Welcome */}
+        {/* HOME TAB */}
         {currentTab === "home" && (
           <div className={styles.homeCentered}>
             <header className={styles.header}>
               <h1 className={styles.welcomeTitle}>Welcome back, Admin 👋</h1>
               <p className={styles.subtitle}>
-                System is running smoothly. Select a tab from the sidebar to
-                manage your data.
+                System is running smoothly. Select a tab from the sidebar.
               </p>
             </header>
           </div>
         )}
 
-        {/* LOGS TAB - Stats & Table */}
+        {/* LOGS TAB */}
         {currentTab === "logs" && (
           <div className={styles.tabFadeIn}>
             <header className={styles.header}>
@@ -106,13 +105,13 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* USERS TAB - Read & Delete */}
+        {/* USERS TAB */}
         {currentTab === "users" && (
           <div className={styles.tabFadeIn}>
             <header className={styles.header}>
               <h2>User Management</h2>
               <p className={styles.subtitle}>
-                View and manage registered system users.
+                View and manage registered users.
               </p>
             </header>
 
@@ -133,7 +132,7 @@ export default function AdminDashboard() {
                 <tbody>
                   {users.map((user) => (
                     <tr key={user.id}>
-                      <td className={styles.emailCell}>{user.name || "N/A"}</td>
+                      <td>{user.name || "N/A"}</td>
                       <td>{user.email}</td>
                       <td>
                         <span className={styles.roleBadge}>
@@ -156,6 +155,9 @@ export default function AdminDashboard() {
             </div>
           </div>
         )}
+
+        {/* TRAFFIC TAB - NEW */}
+        {currentTab === "traffic" && <TrafficDashboard />}
       </main>
     </div>
   );

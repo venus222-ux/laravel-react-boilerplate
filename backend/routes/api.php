@@ -36,3 +36,6 @@ Route::prefix('admin')
         Route::get('/users', [AdminController::class, 'users']); // READ
         Route::delete('/users/{id}', [AdminController::class, 'deleteUser']); // DELETE
 });
+
+
+Route::get('/admin/traffic', [AdminController::class, 'traffic']);

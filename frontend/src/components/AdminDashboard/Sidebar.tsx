@@ -17,13 +17,22 @@ export default function Sidebar({ currentTab, setCurrentTab }: SidebarProps) {
         >
           📊 Dashboard
         </div>
-        f
+
+        {/* Added Traffic Analytics Tab */}
+        <div
+          className={`${styles.navItem} ${currentTab === "traffic" ? styles.activeNavItem : ""}`}
+          onClick={() => setCurrentTab("traffic")}
+        >
+          🌐 Traffic Analytics
+        </div>
+
         <div
           className={`${styles.navItem} ${currentTab === "logs" ? styles.activeNavItem : ""}`}
           onClick={() => setCurrentTab("logs")}
         >
           📜 Activity Logs
         </div>
+
         <div
           className={`${styles.navItem} ${currentTab === "users" ? styles.activeNavItem : ""}`}
           onClick={() => setCurrentTab("users")}

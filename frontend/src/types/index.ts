@@ -89,7 +89,8 @@ export interface DashboardData {
 
 export type Theme = "light" | "dark";
 
-export type TabType = "home" | "logs" | "users";
+// types/index.ts
+export type TabType = "home" | "logs" | "users" | "traffic";
 
 export interface AppState {
   isAuth: boolean;

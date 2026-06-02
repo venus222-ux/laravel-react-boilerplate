@@ -20,8 +20,8 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
           </tr>
         </thead>
         <tbody>
-          {activities.map((log) => (
-            <tr key={log._id}>
+          {activities.map((log, index) => (
+            <tr key={`${log._id}-${index}`}>
               <td className={styles.emailCell}>{log.email}</td>
               <td>
                 <span className={styles.actionText}>{log.action}</span>

@@ -27,6 +27,12 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Routing\Middleware\ThrottleRequests::class . ':api',
         ]);
 
+        $middleware->group('web', [
+           \Illuminate\Cookie\Middleware\EncryptCookies::class,
+           \Illuminate\Session\Middleware\StartSession::class,
+            \App\Http\Middleware\LogActivity::class,
+         ]);
+
         // JWT alias 👇
        $middleware->alias([
         'auth.jwt' => \App\Http\Middleware\JwtMiddleware::class,
