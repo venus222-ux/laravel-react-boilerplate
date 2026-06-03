@@ -2,7 +2,6 @@
 
 namespace App\Listeners;
 
-use App\Events\Auth\UserLoggedIn as AuthUserLoggedIn;
 use App\Events\Auth\UserLoggedIn;
 use Illuminate\Support\Facades\Log;
 

@@ -203,7 +203,7 @@ return [
             'maxJobs' => 0,
             'memory' => 128,
             'tries' => 1,
-            'timeout' => 60,
+            'timeout' => 120,
             'nice' => 0,
         ],
     ],
@@ -221,7 +221,7 @@ return [
         'supervisor-1' => [
             'connection' => 'redis',
             'queue' => ['default', 'emails'],
-            'processes' => 3,
+            'maxProcesses' => 3,
             'tries' => 3,
         ],
     ],
