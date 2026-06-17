@@ -1,5 +1,5 @@
 import styles from "../../styles/AdminDashboard.module.css";
-import type { TabType } from "../../types";
+import type { TabType } from "@/types";
 
 interface SidebarProps {
   currentTab: TabType;

@@ -11,7 +11,7 @@ import type {
   ProfileData,
   ProfileUpdateRequest,
   APIMessageResponse,
-} from "./types";
+} from "@/types";
 
 type FailedQueueItem = {
   resolve: (token: string) => void;

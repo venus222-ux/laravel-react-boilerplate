@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { useStore } from "../store/useStore";
 import styles from "../styles/Profile.module.css";
 
-import type { ProfileData, ProfileFormData } from "../types";
+import type { ProfileData, ProfileFormData } from "@/types";
 
 const Profile = () => {
   const [profile, setProfile] = useState<ProfileData | null>(null);

@@ -6,7 +6,7 @@ import Sidebar from "../components/AdminDashboard/Sidebar";
 import ActivityTable from "../components/AdminDashboard/ActivityTable";
 import TrafficDashboard from "../components/AdminDashboard/TrafficDashboard";
 
-import type { DashboardData, User, TabType } from "../types";
+import type { DashboardData, User, TabType } from "@/types";
 
 export default function AdminDashboard() {
   const [data, setData] = useState<DashboardData | null>(null);

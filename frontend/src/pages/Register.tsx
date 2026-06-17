@@ -5,7 +5,7 @@ import { register } from "../api";
 import { useStore } from "../store/useStore";
 import styles from "./Register.module.css";
 
-import type { RegisterRequest } from "../types";
+import type { RegisterRequest } from "@/types";
 
 export default function Register() {
   const [form, setForm] = useState<RegisterRequest>({

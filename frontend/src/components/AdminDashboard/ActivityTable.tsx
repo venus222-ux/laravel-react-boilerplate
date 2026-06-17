@@ -1,5 +1,5 @@
 import styles from "../../styles/AdminDashboard.module.css";
-import type { ActivityLog } from "../../types";
+import type { ActivityLog } from "@/types";
 
 interface ActivityTableProps {
   activities: ActivityLog[];

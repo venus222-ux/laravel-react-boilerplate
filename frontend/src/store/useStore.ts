@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import API from "../api";
-import type { AppState } from "../types";
+import type { AppState } from "@/types";
 
 export const useStore = create<AppState>((set, get) => {
   let intervalId: ReturnType<typeof setInterval> | null = null;
