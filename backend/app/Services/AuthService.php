@@ -14,8 +14,8 @@ class AuthService
     public function createUser(array $data): User
     {
         $user = User::create([
-            'name'     => $data['name'],
-            'email'    => $data['email'],
+            'name' => $data['name'],
+            'email' => $data['email'],
             'password' => bcrypt($data['password']),
         ]);
 
@@ -28,7 +28,7 @@ class AuthService
 
     public function attemptLogin(array $credentials): ?User
     {
-        if (!auth('api')->attempt($credentials)) {
+        if (! auth('api')->attempt($credentials)) {
             return null;
         }
 
@@ -62,7 +62,7 @@ class AuthService
     public function storeRefreshToken(User $user, string $token): void
     {
         DB::table('refresh_tokens')->insert([
-            'user_id'    => $user->id,
+            'user_id' => $user->id,
             'token_hash' => hash('sha256', $token),
             'expires_at' => now()->addDays(14),
             'created_at' => now(),

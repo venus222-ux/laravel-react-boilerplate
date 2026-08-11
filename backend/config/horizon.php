@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Support\Str;
-
 return [
 
     /*
@@ -208,24 +206,24 @@ return [
         ],
     ],
 
-'environments' => [
-    'production' => [
-        'supervisor-1' => [
-            'maxProcesses' => 10,
-            'balanceMaxShift' => 1,
-            'balanceCooldown' => 3,
+    'environments' => [
+        'production' => [
+            'supervisor-1' => [
+                'maxProcesses' => 10,
+                'balanceMaxShift' => 1,
+                'balanceCooldown' => 3,
+            ],
         ],
-    ],
 
-    'local' => [  // <--- Ensure this matches your APP_ENV (local)
-        'supervisor-1' => [
-            'connection' => 'redis',
-            'queue' => ['default', 'emails'],
-            'maxProcesses' => 3,
-            'tries' => 3,
+        'local' => [  // <--- Ensure this matches your APP_ENV (local)
+            'supervisor-1' => [
+                'connection' => 'redis',
+                'queue' => ['default', 'emails'],
+                'maxProcesses' => 3,
+                'tries' => 3,
+            ],
         ],
     ],
-],
 
     /*
     |--------------------------------------------------------------------------

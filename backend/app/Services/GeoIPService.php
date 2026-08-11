@@ -11,7 +11,7 @@ class GeoIPService
         if (empty($ip) || in_array($ip, ['127.0.0.1', '::1', 'localhost'])) {
             return [
                 'country' => 'Local',
-                'city'    => 'Development'
+                'city' => 'Development',
             ];
         }
 
@@ -24,7 +24,7 @@ class GeoIPService
 
                 return [
                     'country' => $data['country_name'] ?? 'Unknown',
-                    'city'    => $data['city'] ?? 'Unknown',
+                    'city' => $data['city'] ?? 'Unknown',
                 ];
             }
         } catch (\Exception $e) {
@@ -33,7 +33,7 @@ class GeoIPService
 
         return [
             'country' => 'Unknown',
-            'city'    => 'Unknown'
+            'city' => 'Unknown',
         ];
     }
 }

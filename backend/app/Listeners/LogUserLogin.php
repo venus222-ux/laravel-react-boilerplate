@@ -10,13 +10,13 @@ class LogUserLogin
     /**
      * Handle the event.
      */
-    public function handle( UserLoggedIn $event): void
+    public function handle(UserLoggedIn $event): void
     {
         Log::info('User logged in', [
             'user_id' => $event->user->id,
-            'email'   => $event->user->email,
-            'time'    => now(),
-            'ip'      => request()->ip(),
+            'email' => $event->user->email,
+            'time' => now(),
+            'ip' => request()->ip(),
         ]);
     }
 }

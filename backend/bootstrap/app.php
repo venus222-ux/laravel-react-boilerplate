@@ -24,20 +24,20 @@ return Application::configure(basePath: dirname(__DIR__))
         // API group
         $middleware->group('api', [
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            \Illuminate\Routing\Middleware\ThrottleRequests::class . ':api',
+            \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
         ]);
 
         $middleware->group('web', [
-           \Illuminate\Cookie\Middleware\EncryptCookies::class,
-           \Illuminate\Session\Middleware\StartSession::class,
+            \Illuminate\Cookie\Middleware\EncryptCookies::class,
+            \Illuminate\Session\Middleware\StartSession::class,
             \App\Http\Middleware\LogActivity::class,
-         ]);
+        ]);
 
         // JWT alias 👇
-       $middleware->alias([
-        'auth.jwt' => \App\Http\Middleware\JwtMiddleware::class,
-         'role'     => \App\Http\Middleware\AdminMiddleware::class,
-       ]);
+        $middleware->alias([
+            'auth.jwt' => \App\Http\Middleware\JwtMiddleware::class,
+            'role' => \App\Http\Middleware\AdminMiddleware::class,
+        ]);
     })
 
     ->withExceptions(function (Exceptions $exceptions): void {

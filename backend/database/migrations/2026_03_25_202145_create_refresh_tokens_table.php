@@ -12,15 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('refresh_tokens', function (Blueprint $table) {
-          $table->id();
-          $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-          $table->string('token_hash');
-          $table->timestamp('expires_at');
-          $table->boolean('revoked')->default(false);
-          $table->timestamps();
+            $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('token_hash');
+            $table->timestamp('expires_at');
+            $table->boolean('revoked')->default(false);
+            $table->timestamps();
 
         });
-    } 
+    }
 
     /**
      * Reverse the migrations.

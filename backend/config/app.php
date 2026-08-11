@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Support\ServiceProvider;
-
 return [
 
     /*
@@ -126,9 +124,8 @@ return [
     ],
 
     'aliases' => [
-       'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
-       'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
-     ],
-
+        'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
+        'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
+    ],
 
 ];

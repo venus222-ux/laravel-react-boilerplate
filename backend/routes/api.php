@@ -1,8 +1,8 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AdminController;
 
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -26,7 +26,6 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::delete('/profile', [AuthController::class, 'destroyProfile']);
 });
 
-
 // routes/api.php
 
 Route::prefix('admin')
@@ -35,7 +34,6 @@ Route::prefix('admin')
         Route::get('/dashboard', [AdminController::class, 'dashboard']);
         Route::get('/users', [AdminController::class, 'users']); // READ
         Route::delete('/users/{id}', [AdminController::class, 'deleteUser']); // DELETE
-});
-
+    });
 
 Route::get('/admin/traffic', [AdminController::class, 'traffic']);

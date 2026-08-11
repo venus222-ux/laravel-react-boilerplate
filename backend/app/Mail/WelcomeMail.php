@@ -18,7 +18,7 @@ class WelcomeMail extends Mailable
         return $this->subject('Welcome 🚀')
             ->view('emails.welcome')
             ->with([
-                'user' => $this->user
+                'user' => $this->user,
             ]);
     }
 }

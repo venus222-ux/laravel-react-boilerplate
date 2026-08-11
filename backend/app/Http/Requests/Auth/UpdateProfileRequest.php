@@ -15,8 +15,9 @@ class UpdateProfileRequest extends FormRequest
     public function rules(): array
     {
         $userId = Auth::id();
+
         return [
-            'email'    => 'required|email|unique:users,email,' . $userId,
+            'email' => 'required|email|unique:users,email,'.$userId,
             'password' => 'nullable|min:6|confirmed',
         ];
     }

@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\ServiceProvider;
 use Tymon\JWTAuth\JWTGuard;
 
 class JWTServiceProvider extends ServiceProvider

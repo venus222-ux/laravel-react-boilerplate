@@ -2,22 +2,20 @@
 
 namespace App\Providers;
 
-use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Event;
-
 use App\Events\Auth\PasswordResetRequested;
-use App\Events\Auth\UserRegistered;
 use App\Events\Auth\UserLoggedIn;
-
+use App\Events\Auth\UserRegistered;
+use App\Listeners\LogUserLogin;
 use App\Listeners\SendResetPasswordNotification;
 use App\Listeners\SendWelcomeEmail;
-use App\Listeners\LogUserLogin;
+use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider
 {
     protected $listen = [
         UserRegistered::class => [SendWelcomeEmail::class],
-        UserLoggedIn::class   => [LogUserLogin::class],
+        UserLoggedIn::class => [LogUserLogin::class],
         // PasswordResetRequested is handled manually below
     ];
 

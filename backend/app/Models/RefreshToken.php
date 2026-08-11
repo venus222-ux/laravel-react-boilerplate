@@ -10,7 +10,7 @@ class RefreshToken extends Model
         'user_id',
         'token_hash',
         'expires_at',
-        'revoked'
+        'revoked',
     ];
 
     protected $casts = [

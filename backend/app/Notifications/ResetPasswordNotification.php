@@ -3,10 +3,9 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Contracts\Queue\ShouldQueue;
-
+use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class ResetPasswordNotification extends Notification implements ShouldQueue
 {
@@ -14,17 +13,20 @@ class ResetPasswordNotification extends Notification implements ShouldQueue
 
     protected $token;
 
-
-    public function __construct(string $token) {
+    public function __construct(string $token)
+    {
         $this->token = $token;
     }
 
-    public function via($notifiable) {
+    public function via($notifiable)
+    {
         return ['mail']; // or ['mail', 'database'] if you want
     }
 
-    public function toMail($notifiable) {
-$url = rtrim(env('FRONTEND_URL', 'http://localhost:5173'), '/') . "/reset-password/{$this->token}?email={$notifiable->email}";
+    public function toMail($notifiable)
+    {
+        $url = rtrim(env('FRONTEND_URL', 'http://localhost:5173'), '/')."/reset-password/{$this->token}?email={$notifiable->email}";
+
         return (new MailMessage)
             ->subject('Reset Your Password')
             ->greeting("Hello {$notifiable->name},")

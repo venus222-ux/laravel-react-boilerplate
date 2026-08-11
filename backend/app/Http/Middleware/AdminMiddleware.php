@@ -11,18 +11,17 @@ class AdminMiddleware
     {
         $user = auth()->user();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        if (!$user->hasRole('admin')) {
+        if (! $user->hasRole('admin')) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
         return $next($request);
     }
 }
-
 
 /***
  * Request
