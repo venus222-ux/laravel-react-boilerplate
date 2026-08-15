@@ -1,7 +1,7 @@
 <?php
 
 return [
-'laravel', // Aceasta va fi prefixul în Grafana (ex: laravel_http_requests_total)
+    'namespace' => 'laravel', // Aceasta va fi prefixul în Grafana (ex: laravel_http_requests_total)
 
     'redis' => [
         'host' => env('REDIS_HOST', 'redis'), // Folosește numele containerului tău Redis

@@ -1,19 +1,11 @@
 {
-    # Activează motorul FrankenPHP
     frankenphp
     order php_server before file_server
 }
 
 :8000 {
-    # Setează folderul public pentru Laravel
     root * public/
-
-    # Comprimă răspunsurile pentru performanță
     encode zstd gzip
-
-    # 🎯 EXPUNE METRICILE PENTRU PROMETHEUS AICI
-    metrics /metrics
-
-    # Trimite restul request-urilor către Laravel
+    # metrics /metrics    ← elimină/comentează linia asta
     php_server
 }
