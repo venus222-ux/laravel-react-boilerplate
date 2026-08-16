@@ -1,51 +1,154 @@
-Laravel_react_boilerplate\
-├── backend/ # Laravel 12 API
-└── frontend/ # React + Vite + TS SPA
+# News Aggregator — Laravel + React (Docker)
 
-## Comenzi utile de dezvoltare
+Aplicație full-stack rulată complet în Docker.
 
-✅ 1. Set Up Laravel Backend
-cd backend
-cp .env.example .env
-composer install
-php artisan key:generate
-php artisan migrate
-php artisan db:seed
-php artisan serve
+### Stack
+- **Backend:** Laravel 12 + FrankenPHP
+- **Frontend:** React + Vite
+- **Baze de date:** MySQL 8, MongoDB 7, Redis 7
+- **Altele:** Elasticsearch, Soketi (WebSockets), Horizon, Prometheus, Grafana, phpMyAdmin
 
-php artisan jwt:secret
-php artisan config:clear
-php artisan config:cache
+---
 
-✅ 2. Set Up React Frontend
-cd ../frontend
-cp .env.example .env
-npm install
-npm run dev
+## 🚀 Pornire rapidă
 
-✅ 3. Run in the root project:
-npm run dev
-docker-compose up -d
+```bash
+# 1. Pornește totul
+docker compose up -d --build
 
-## Stack tehnic
+# 2. Backend setup
+cp backend/.env.example backend/.env
+docker compose exec laravel_app composer install
+docker compose exec laravel_app php artisan key:generate
+docker compose exec laravel_app php artisan jwt:secret
+docker compose exec laravel_app php artisan migrate --seed
 
-**Backend**
+# 3. Frontend setup
+cp frontend/.env.example frontend/.env
+docker compose exec frontend npm install
+```
 
-- Laravel (PHP) + MySQL
-- Redis (queue, cache) + Laravel Horizon (monitorizare cozi)
-- MongoDB (loguri de upload)
+Apoi deschide:
+- Frontend → http://localhost:5173
+- API → http://localhost:8000
+- phpMyAdmin → http://localhost:8081
+- Grafana → http://localhost:3000 (user: `admin`)
 
-**Frontend**
+---
 
-- React + TypeScript
-- Zustand (state management)
-- React Query (data fetching pentru unele hook-uri)
-- Bootstrap + CSS Modules
+## 🌐 URL-uri importante
 
+| Serviciu          | URL                      |
+|-------------------|--------------------------|
+| React (Vite)      | http://localhost:5173    |
+| Laravel API       | http://localhost:8000    |
+| phpMyAdmin        | http://localhost:8081    |
+| Grafana           | http://localhost:3000    |
+| Prometheus        | http://localhost:9090    |
+| Elasticsearch     | http://localhost:9200    |
+| Soketi (WS)       | http://localhost:6001    |
+| MySQL (host)      | localhost:3307           |
+| MongoDB (host)    | localhost:27018          |
+| Redis (host)      | localhost:6380           |
 
-```env
-QUEUE_CONNECTION=redis
-MAIL_MAILER=smtp
-MAIL_ADMIN_ADDRESS=admin@yourcompany.com
-FRONTEND_URL=http://localhost:5173
-ELASTICSEARCH_HOST=http://127.0.0.1:9200
+---
+
+## ⚙️ Configurație .env (important!)
+
+### Backend (`backend/.env`)
+```dotenv
+DB_HOST=mysql
+DB_PORT=3306
+REDIS_HOST=redis
+DB_MONGO_HOST=mongodb
+ELASTICSEARCH_HOST=elasticsearch
+PUSHER_HOST=soketi          # ← din interiorul Docker
+PUSHER_PORT=6001
+```
+
+### Frontend (`frontend/.env`)
+```dotenv
+VITE_API_URL=http://localhost:8000
+VITE_PUSHER_HOST=localhost  # ← din browser
+VITE_PUSHER_PORT=6001
+```
+
+> **Regulă simplă:**  
+> - Din **containere** → folosești numele serviciului (`mysql`, `redis`, `soketi`...)  
+> - Din **browser** → folosești `localhost` + portul publicat
+
+---
+
+## 🛠️ Comenzi utile
+
+```bash
+# Status
+docker compose ps
+
+# Loguri
+docker compose logs -f
+docker compose logs -f laravel_app
+docker compose logs -f laravel_worker
+
+# Restart
+docker compose restart laravel_app
+docker compose restart laravel_worker
+
+# Oprește tot
+docker compose down
+
+# Oprește + șterge volume (atenție: șterge datele!)
+docker compose down -v
+```
+
+### Laravel
+```bash
+docker compose exec laravel_app bash
+docker compose exec laravel_app php artisan migrate
+docker compose exec laravel_app php artisan optimize:clear
+docker compose exec laravel_app php artisan horizon:status
+docker compose exec laravel_app php artisan schedule:work
+docker compose restart prometheus
+```
+
+### Frontend
+```bash
+docker compose exec frontend npm install
+docker compose exec frontend npm run build
+```
+
+---
+
+## 📋 Servicii Docker
+
+| Service            | Port host | Rol                        |
+|--------------------|-----------|----------------------------|
+| `laravel_app`      | 8000      | API + FrankenPHP           |
+| `laravel_worker`   | —         | Horizon (queues)           |
+| `frontend`         | 5173      | React + Vite               |
+| `mysql`            | 3307      | MySQL                      |
+| `mongodb`          | 27018     | MongoDB                    |
+| `redis`            | 6380      | Cache + Queue              |
+| `elasticsearch`    | 9200      | Search                     |
+| `soketi`           | 6001      | WebSockets                 |
+| `prometheus`       | 9090      | Metrics                    |
+| `grafana`          | 3000      | Dashboards                 |
+| `phpmyadmin`       | 8081      | Admin MySQL                |
+
+---
+
+## 🔑 Credențiale
+
+**MySQL / phpMyAdmin**
+- Database: `news_aggregator`
+- User: `news_aggregator`
+- Password: `secret`
+
+**Soketi / Pusher**
+- App ID: `news_aggregator`
+- Key: `news_aggregator_key`
+- Secret: `news_aggregator_secret`
+
+**Grafana**
+- User: `admin`
+```
