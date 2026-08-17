@@ -20,24 +20,25 @@ class PrometheusMetricsMiddleware
         $response = $next($request);
         $duration = microtime(true) - $start;
 
-        // try/catch obligatoriu: o excepție necaptată aici nu trebuie să dărâme request-ul original.
         try {
             RedisAdapter::setDefaultOptions(config('prometheus.redis'));
             $registry = new CollectorRegistry(new RedisAdapter());
 
             $route = $request->route()?->uri() ?? $request->path();
 
+            // 1. Nume schimbat în 'laravel_http_requests_total' pentru a se potrivi cu Grafana
             $counter = $registry->getOrRegisterCounter(
-                config('prometheus.namespace'),
-                'http_requests_total',
+                '', // Lăsăm namespace gol, numele este deja complet
+                'laravel_http_requests_total',
                 'Total number of HTTP requests',
                 ['method', 'route', 'status']
             );
             $counter->inc([$request->method(), $route, (string) $response->getStatusCode()]);
 
+            // 2. Nume schimbat în 'laravel_http_request_duration_seconds' pentru histogramă
             $histogram = $registry->getOrRegisterHistogram(
-                config('prometheus.namespace'),
-                'http_request_duration_seconds',
+                '',
+                'laravel_http_request_duration_seconds',
                 'HTTP request duration in seconds',
                 ['method', 'route'],
                 [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5]
