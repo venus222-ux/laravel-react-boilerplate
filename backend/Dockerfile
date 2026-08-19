@@ -28,7 +28,7 @@ RUN install-php-extensions \
 
 # Extensia MongoDB (nu e inclusă în install-php-extensions implicit pe toate versiunile,
 # se instalează separat prin PECL pentru siguranță)
-RUN pecl install mongodb && docker-php-ext-enable mongodb
+RUN pecl install mongodb-1.21.0 && docker-php-ext-enable mongodb
 
 # Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
